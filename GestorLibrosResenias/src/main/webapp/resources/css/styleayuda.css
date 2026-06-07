@@ -1,0 +1,155 @@
+/* ============================================
+   AYUDA - ESTILOS ESPECÍFICOS
+============================================ */
+.seccion-ayuda {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+    animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.seccion-ayuda h2 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #667eea;
+    font-size: 1.75rem;
+}
+
+.seccion-ayuda h3 {
+    color: #2c3e50;
+    margin: 1.5rem 0 1rem 0;
+    font-size: 1.3rem;
+}
+
+.paso {
+    background-color: #f8f9fa;
+    border-left: 4px solid #667eea;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 0 8px 8px 0;
+    transition: all 0.3s ease;
+}
+
+.paso:hover {
+    background-color: #edf2ff;
+    transform: translateX(5px);
+}
+
+.paso h4 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.paso p {
+    color: #555;
+    margin-bottom: 0.25rem;
+    line-height: 1.5;
+}
+
+.rol-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 1.5rem;
+}
+
+.admin-info, .user-info {
+    padding: 1.5rem;
+    border-radius: 10px;
+    background: linear-gradient(145deg, #ffffff, #f8f9fa);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 2px solid transparent;
+}
+
+.admin-info {
+    border-color: #3f51b5;
+}
+
+.user-info {
+    border-color: #8e0000;
+}
+
+.admin-info h3, .user-info h3 {
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.admin-info ul, .user-info ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 1rem 0 0 0;
+}
+
+.admin-info li, .user-info li {
+    padding: 0.5rem 0;
+    color: #555;
+    position: relative;
+    padding-left: 1.75rem;
+}
+
+.admin-info li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.user-info li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+/* Preguntas frecuentes */
+.seccion-ayuda p strong {
+    color: #2c3e50;
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 1.05rem;
+}
+
+.seccion-ayuda p:not(:has(strong)) {
+    margin-left: 1.5rem;
+    color: #666;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px dashed #e1e5eb;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .rol-info {
+        grid-template-columns: 1fr;
+    }
+    
+    .seccion-ayuda {
+        padding: 1.5rem;
+    }
+    
+    .paso {
+        padding: 1rem;
+    }
+}

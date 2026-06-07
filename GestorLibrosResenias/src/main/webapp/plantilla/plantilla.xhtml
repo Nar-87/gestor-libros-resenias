@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="jakarta.faces.html"
+    xmlns:ui="jakarta.faces.facelets"
+    xmlns:f="jakarta.faces.core"
+    xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <title>#{appmsg.tit_header_exp}</title>
+        <h:outputStylesheet library="css" name="stylebase.css"/>
+        <ui:insert name="styles"/>
+    </h:head>
+
+    <h:body>
+        <!-- cabecera general -->
+        <div class="template-wrapper #{loginBean.rol eq 'Administrador' ? 'tema-admin' : 'tema-usuario'}">
+            <header class="app-header">
+                <div class="header-content">
+                    <h1 class="app-title">#{tituloPagina}</h1>
+                    <div class="header-user-info">
+                        <span class="user-name">#{loginBean.usuario}</span>
+                        <span class="user-role">(#{loginBean.rol})</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- contenido -->
+            <main class="template-main-content">
+                <ui:insert name="contenido"/>
+            </main>
+
+            <!-- pie de página -->
+            <footer class="pie-pagina">
+                <div>&copy; #{appmsg.tit_footer}</div>
+                <div>
+                    <h:link outcome="ayuda.xhtml"
+                            value="📖 #{appmsg.lk_ayuda}"
+                            styleClass="help-link"
+                            title="#{appmsg.tit_lk_ayuda}"/>
+                </div>
+            </footer>
+
+        </div>
+
+    </h:body>
+
+</ui:composition>

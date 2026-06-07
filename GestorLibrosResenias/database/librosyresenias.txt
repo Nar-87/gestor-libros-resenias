@@ -1,0 +1,153 @@
+-- 1. CREAR USUARIO DEDICADO
+CREATE USER IF NOT EXISTS 'reseniasdb'@'localhost' 
+IDENTIFIED BY 'R3s3n14S!Seqr';
+
+-- 2. CREAR Y SELECCIONAR BASE DE DATOS
+DROP DATABASE IF EXISTS reseniasdb;
+CREATE DATABASE reseniasdb 
+CHARACTER SET utf8mb4 
+COLLATE utf8mb4_unicode_ci;
+
+-- 3. OTORGAR PERMISOS
+GRANT ALL PRIVILEGES ON reseniasdb.* TO 'reseniasdb'@'localhost';
+FLUSH PRIVILEGES;
+
+USE reseniasdb;
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+-- create DATABASE reseniasdb;
+
+use reseniasdb;
+--
+-- Base de datos: dawreseniasdb
+--
+
+drop table if exists tbtaglibro;
+drop table if exists tbresenia;
+drop table if exists tbusuario;
+drop table if exists tbperfil;
+drop table if exists tblibro;
+drop table if exists tbtag;
+
+/*Tablas*/
+
+Create table if not exists tbtag  (
+	idtag int primary key AUTO_INCREMENT,
+    nomtag varchar(15) not null
+);
+
+insert into tbtag (nomtag) values ('Terror');
+insert into tbtag (nomtag) values ('Accion');
+insert into tbtag (nomtag) values ('Romance');
+insert into tbtag (nomtag) values ('Thriller');
+insert into tbtag (nomtag) values ('Drama');
+
+Create table if not exists tbperfil  (
+	idperfil int primary key,
+    desperfil varchar(20) not null
+);
+
+insert into tbperfil (idperfil, desperfil) values (0, 'Administrador');
+insert into tbperfil (idperfil, desperfil) values (1, 'Temporal');
+insert into tbperfil (idperfil, desperfil) values (2, 'Lector');
+insert into tbperfil (idperfil, desperfil) values (3, 'Escritor de reseñas');
+
+DROP TABLE IF EXISTS tblibro;
+
+CREATE TABLE tblibro (
+    idlibro INT PRIMARY KEY AUTO_INCREMENT,
+    nombrelibro VARCHAR(50) NOT NULL,
+    autor VARCHAR(100) NOT NULL,
+    aniolibro INT,
+    isbn VARCHAR(50),
+    tematica VARCHAR(20) NOT NULL,
+    descripcion TINYTEXT NOT NULL,
+    imglibro VARCHAR(256)
+);
+
+INSERT INTO tblibro (nombrelibro, autor, tematica, descripcion, imglibro)
+VALUES ('Me alegro de que mi madre haya muerto', 
+        'Jennette McCurdy',
+        'Autobiografia',
+        'En 2023 llega a Tendencias las desgarradora e hilarante biografía de Jennette McCurdy, la estrella de iCarly y Sam & Cat, donde nos cuenta sus dificultades como actriz infantil, sus trastornos alimentarios, sus adicciones, la complicada relación con su madre y cómo retomó el control de su vida.',
+        'img/arts/66974884.jpg');
+
+INSERT INTO tblibro (nombrelibro, autor, tematica, descripcion, imglibro)
+VALUES ('Así se pierde la guerra del tiempo',
+        'Amal El-Mohtar, Max Gladstone',
+        'Sci-Fi',
+        'Una épica historia de amor a través del tiempo y el espacio, una obra atemporal y un refugio en tiempos difíciles. Entre las cenizas de un mundo moribundo, Roja encuentra una carta con la inscripció «Quemar antes de leer. Azul». Roja y Azul, dos agentes de facciones rivales en una guerra que se extiende más allá de los confines del espacio y el tiempo, inician una correspondencia prohibida.',
+		'img/arts/157007017.jpg');
+
+INSERT INTO tblibro (nombrelibro, autor, tematica, descripcion, imglibro)
+VALUES ('Un animal salvaje',
+        'Joël Dicker',
+        'Thriller',
+        'El 2 de julio de 2022, dos delincuentes se disponen a robar en una importante joyería de Ginebra. Un incidente que dista mucho de ser un vulgar atraco. Veinte días antes, en una lujosa urbanización a orillas del lago Lemán, Sophie Braun se prepara para celebrar su cuadragésimo cumpleaños. La vida le sonríe: vive con su familia en una mansión rodeada de bosques, pero su idílico mundo está a punto de tambalearse. Su marido anda enredado en sus pequeños secretos. Su vecino, un policía de reputación irreprochable, se ha obsesionado con ella y la espía hasta en los detalles más íntimos. Y un misterioso merodeador le hace un regalo que pone su vida en peligro. Serán necesarios varios viajes al pasado, lejos de Ginebra, para hallar el origen de esta intriga diabólica de la que nadie saldrá indemne.',
+        'img/arts/204780055.jpg');
+
+INSERT INTO tblibro (nombrelibro, autor, tematica, descripcion, imglibro)
+VALUES ('Tan poca vida',
+        'Hanya Yanagihara',
+        'Ficción',
+        'Para saber... Qué dicen y qué callan los hombres, De dónde viene y adónde va la culpa, Cuánto importa el sexo, A quién podemos llamar amigo, Y finalmente... Qué precio tiene la vida cuando ya no tiene valor. Para descubrir eso y más, aquí está Tan poca vida, una historia que recorre más de tres décadas de amistad en la vida de cuatro hombres que crecen juntos en Manhattan. Cuatro hombres que tienen que sobrevivir al fracaso y al éxito y que, a lo largo de los años, aprenden a sobreponerse a las crisis económicas, sociales y emocionales. Cuatro hombres que comparten una idea muy peculiar de la intimidad, una manera de estar juntos hecha de pocas palabras y muchos gestos. Cuatro hombres cuya relación la autora utiliza para realizar una minuciosa indagación de los límites de la naturaleza humana.',
+        'img/arts/33662956.jpg');
+
+INSERT INTO tblibro (nombrelibro, autor, tematica, descripcion, imglibro)
+VALUES ('El bosque oscuro - 3 cuerpos #2',
+        'Liu Cixin',
+        'Sci-Fi',
+        'En El bosque oscuro, la humanidad se recupera del impacto producido por la inminencia de una invasión alienígena en el plazo de cuatro siglos. Los colaboradores humanos de los extraterrestres pueden haber sido derrotados, pero la presencia de sofones (las partículas subatómicas que permiten el acceso instantáneo de los trisolarianos a toda la información humana) indica que los planes de defensa de la Tierra están completamente expuestos al enemigo. Sólo la mente humana sigue siendo un secreto. Y ese es el motor que hay detrás del atrevido plan que otorga a cuatro hombres enormes recursos para diseñar unas estrategias secretas, ocultas a través del engaño tanto de la Tierra como de Trisolaris. Tres de esos hombres son influyentes y científicos, pero el cuarto es un completo desconocido. Luo Ji, un ambicioso astrónomo y sociólogo chino, está desconcertado por su nueva condición. Lo único que sabe es que él es el único…',
+        'img/arts/32827084.jpg');
+
+INSERT INTO tblibro (nombrelibro, autor, tematica, descripcion, imglibro)
+VALUES ('El dique - Blackwater #2',
+        'Michael McDowell',
+        'Terror',
+        'Descubre el segundo volumen de la saga Blackwater. Una saga matriarcal. Mujeres poderosas que luchan por el dominio durante generaciones. Una atmósfera única para una lectura adictiva. Un retrato realista con toques sobrenaturales.',
+        'img/arts/202795005.jpg');
+
+
+Create table if not exists tbusuario  (
+	idusu int primary key AUTO_INCREMENT,
+    codusu varchar(20) not null,
+	nombcusu varchar(30) not null,
+	emailusu varchar(30) not null,
+	rrssusu varchar(30),
+    passusu varchar(15) not null,
+    baja boolean not null default false,
+	idperfil int not null, 
+	foreign key (idperfil) references tbperfil(idperfil)
+);
+
+insert into tbusuario (codusu, nombcusu, emailusu, rrssusu, passusu, idperfil) values ('admin','Administrador','admin.edu@gmail.com', null, 'admin', 0);
+insert into tbusuario (codusu, nombcusu, emailusu, rrssusu, passusu, idperfil) values ('usupru','Ususario de Prueba','prueba@gmail.com', null, '4321', 1);
+insert into tbusuario (codusu, nombcusu, emailusu, rrssusu, passusu, idperfil) values ('usulector','Usuario Prueba Lector','lector@gmail.com', null, 'lector', 2);
+insert into tbusuario (codusu, nombcusu, emailusu, rrssusu, passusu, idperfil) values ('usuescritor','Usuario Prueba Escritor','escritor@gmail.com', null, 'escritor', 3);
+
+Create table if not exists tbresenia  (
+	idresenia int primary key AUTO_INCREMENT,
+    titulores varchar(50),
+	puntosres int not null,
+	contenidores text,
+	fechares date not null,
+	idlibro int not null, 
+	idusu int not null,
+	foreign key (idlibro) references tblibro(idlibro),
+	foreign key (idusu) references tbusuario(idusu)
+);
+
+Create table if not exists tbtaglibro (
+	idlibro int not null,
+	idtag int not null,
+	primary key(idlibro, idtag),
+	foreign key (idlibro) references tblibro(idlibro),
+	foreign key (idtag) references tbtag(idtag)
+);
+
+
+COMMIT;

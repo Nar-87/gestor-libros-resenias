@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="jakarta.faces.core">
+
+    <h:head>
+        <title>#{appmsg.tit_cab_login}</title>
+        <h:outputStylesheet library="css" name="stylelogin.css" />
+    </h:head>
+
+    <h:body class="login-body">
+        <div class="login-container">
+            
+            <!-- Título principal -->
+            <div class="login-header">
+                <h1 class="app-title">#{appmsg.tit_app}</h1>
+ 
+            </div>
+
+            <div class="login-horizontal-container">
+                
+                <!-- Tarjeta de login -->
+                <div class="login-card-blue">
+                    <div class="card-header-blue">
+                        <h2><i class="pi pi-sign-in"></i>#{appmsg.tarjetalg_h2}</h2>
+                        <p class="card-subtitle">#{appmsg.tarjetalg_p}</p>
+                    </div>
+                    
+                    <!-- Mensajes globales -->
+                    <p:growl id="growl" showDetail="true" life="5000" />
+                    
+                    <h:form id="loginForm">
+                        <div class="form-container-blue">
+                            
+                            <!-- Campo Usuario -->
+                            <div class="input-group">
+                                <label for="usuario" class="input-label">
+                                    <i class="pi pi-user"></i> #{appmsg.lbl_usu}
+                                </label>
+                                <p:inputText id="usuario"
+                                           value="#{loginBean.usuario}"
+                                           required="true"
+                                           requiredMessage="El usuario es obligatorio"
+                                           placeholder="#{appmsg.ph_loginusu}"
+                                           styleClass="login-input-blue"/>
+                                <p:message for="usuario" styleClass="error-message" />
+                            </div>
+                            
+                            <!-- Campo Contraseña -->
+                            <div class="input-group">
+                                <label for="password" class="input-label">
+                                    <i class="pi pi-lock"></i> #{appmsg.lbl_pass}
+                                </label>
+                                <p:password id="password"
+                                          value="#{loginBean.password}"
+                                          required="true"
+                                          requiredMessage="La contraseña es obligatoria"
+                                          placeholder="#{appmsg.ph_loginpass}"
+                                          toggleMask="true"
+                                          feedback="false"
+                                          styleClass="login-input-blue"/>
+                                <p:message for="password" styleClass="error-message" />
+                            </div>
+                            
+                            <!-- Botón de acceso -->
+                            <div class="button-container">
+                                <p:commandButton value="#{appmsg.btn_accederlogin}"
+                                               icon="pi pi-sign-in"
+                                               action="#{loginBean.login}"
+                                               process="@form"
+                                               update="growl"
+                                               styleClass="login-button-blue"/>
+                            </div>
+                            
+                        </div>
+                    </h:form>
+                </div>
+                
+                <!-- Información de roles -->
+                <div class="info-sidebar">
+                    <h3><i class="pi pi-info-circle"></i>#{appmsg.info_h3}</h3>
+                    
+                    <div class="role-info-item">
+                        <div class="role-icon admin-icon">
+                            <i class="pi pi-shield"></i>
+                        </div>
+                        <div class="role-details">
+                            <h4>#{appmsg.info_h4_admin}</h4>
+                            <p>#{appmsg.info_p_admin}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="role-info-item">
+                        <div class="role-icon user-icon">
+                            <i class="pi pi-user"></i>
+                        </div>
+                        <div class="role-details">
+                            <h4>#{appmsg.info_h4_usu}</h4>
+                            <p>#{appmsg.info_p_usu}</p>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>            
+        </div>
+    </h:body>
+</html>

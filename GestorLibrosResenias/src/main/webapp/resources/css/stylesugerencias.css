@@ -1,0 +1,146 @@
+/* TARJETAS */
+.tarjeta {
+    background: rgba(255, 255, 255, 0.92);
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.tarjeta h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+}
+
+.tema-admin .tarjeta h3 {
+    color: #1a237e;
+    border-bottom: 2px solid #3f51b5;
+}
+
+.tema-usuario .tarjeta h3 {
+    color: #6a1b1b;
+    border-bottom: 2px solid #8e0000;
+}
+
+/* TABLAS */
+.tabla-contenido {
+    width: 100% !important;
+    background: white;
+}
+
+.ui-datatable thead th {
+    background: #f5f5f5;
+    padding: 15px !important;
+    border-bottom: 2px solid #ddd;
+}
+
+.ui-datatable tbody td {
+    padding: 12px 15px !important;
+    border-bottom: 1px solid #eee;
+}
+
+/* BOTONES */
+.boton {
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.boton-info {
+    background: #4CAF50;
+    color: white;
+}
+
+.boton-info:hover {
+    background: #43a047;
+}
+
+.boton-pequeno {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+}
+
+/* NAVEGACIÓN */
+.contenedor-navegacion {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 40px;
+    padding-top: 25px;
+    border-top: 1px solid #eee;
+    flex-wrap: wrap;
+}
+
+.boton-navegacion {
+    padding: 12px 25px;
+    border-radius: 6px;
+    font-size: 1rem;
+    color: white;
+}
+
+.boton-inicio {
+    background: #9c27b0;
+}
+
+.boton-secundario {
+    background: #2196f3;
+}
+
+.boton-logout {
+    background: #607d8b;
+}
+
+/* MENÚ PRIMEFACES*/
+.menu-container {
+    margin-bottom: 25px;
+}
+
+.ui-menubar {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-radius: 10px !important;
+    padding: 8px 15px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+.ui-menuitem.ui-state-hover > .ui-menuitem-link {
+    background-color: #f0f0f0 !important;
+}
+
+.ui-menuitem.ui-state-active > .ui-menuitem-link,
+.active-menu > .ui-menuitem-link {
+    background-color: #4CAF50 !important;
+    color: white !important;
+    font-weight: bold !important;
+}
+
+.disabled-link .ui-menuitem-link {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .contenedor-principal {
+        padding: 15px;
+        margin: 10px;
+    }
+
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .app-title {
+        font-size: 2rem;
+    }
+
+    .header-user-info {
+        justify-content: center;
+    }
+}

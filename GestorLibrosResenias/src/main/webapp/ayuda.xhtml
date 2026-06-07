@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/plantilla/plantilla.xhtml" 
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="jakarta.faces.facelets">
+
+    <ui:define name="styles">
+        <h:outputStylesheet library="css" name="styleayuda.css" />
+    </ui:define>
+
+    <ui:define name="contenido">
+        <div class="ayuda-container">
+
+            <h:form>
+            <!-- Botón de volver -->
+            <div class="navigation-buttons" style="margin-bottom: 2rem;">
+                <p:commandButton value="#{appmsg.btn_volver_res}" 
+                              icon="pi pi-arrow-left"
+                              action="#{reseniaBean.volverDesdeAyuda}"
+                              styleClass="btn-secondary"/>
+            </div>
+            </h:form>
+            <div class="seccion-ayuda">
+                <h2>#{appmsg.tit_uso}</h2>
+
+                <div class="paso">
+                    <h4>#{appmsg.ayuda_h4}</h4>
+                    <p>#{appmsg.ve_pag} <strong>#{appmsg.ayuda_libros}</strong> #{appmsg.ayuda_para} </p>
+                </div>
+
+                <div class="paso">
+                    <h4>#{appmsg.ayuda_ver_add}</h4>
+                    <p>#{appmsg.en_pag_de} <strong>#{appmsg.de_res}</strong>#{appmsg.puedes_ver}</p>
+                    <p><strong>#{appmsg.p_usu}</strong> #{appmsg.tmb_nuevas_res}</p>
+                </div>
+
+                <div class="paso">
+                    <h4>#{appmsg.ayuda_obtener_sug}</h4>
+                    <p><strong>#{appmsg.por_autor_ayuda}</strong> #{appmsg.haz_click_otros}</p>
+                    <p>#{appmsg.p_usu}<strong>#{appmsg.por_res_sim}</strong> #{appmsg.despues_ver_res}</p>
+                </div>
+            </div>,.
+
+            <div class="seccion-ayuda">
+                <h2>#{appmsg.ayuda_h2_rol}</h2>
+
+                <div class="rol-info">
+                    <div class="admin-info">
+                        <h3>👨‍💼 #{appmsg.admin_ayuda}</h3>
+                        <ul>
+                            <li>#{appmsg.li_ayuda_uno}</li>
+                            <li>#{appmsg.li_ayuda_dos}</li>
+                            <li>#{appmsg.li_ayuda_tres}</li>
+                            <li>#{appmsg.li_ayuda_cuatro}</li>
+                        </ul>
+                    </div>
+
+                    <div class="user-info">
+                        <h3>👤 #{appmsg.usu_ayuda}</h3>
+                        <ul>
+                            <li>#{appmsg.li_ayuda_cinco}</li>
+                            <li>#{appmsg.li_ayuda_seis}</li>
+                            <li>#{appmsg.li_ayuda_siete}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="seccion-ayuda">
+                <h2>❓ #{appmsg.faqs_h2_ayuda}</h2>
+                <p><strong>#{appmsg.cambio_pass}</strong><br/>
+                    #{appmsg.contact_admin}</p>
+
+                    <p><strong>#{appmsg.ciertas_ops}</strong><br/>
+                        #{appmsg.limit_acc}</p>
+
+                    <p><strong>#{appmsg.prob_tec}</strong><br/>
+                        #{appmsg.cont_email}</p>
+            </div>
+
+            <!-- Botón de volver al final también -->
+            <div class="navigation-buttons" style="margin-top: 2rem;">
+                <p:button value="#{appmsg.bnt_volver_ayuda}" 
+                          icon="pi pi-home"
+                          outcome="#{loginBean.rol eq 'Administrador' ? '/libros' : '/resenias'}"
+                          styleClass="btn-secondary"
+                          title="#{appmsg.tit_btn_volver_ayuda}"/>
+            </div>
+
+        </div>
+    </ui:define>
+</ui:composition>

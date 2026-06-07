@@ -1,0 +1,378 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/plantilla/plantilla.xhtml" 
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="jakarta.faces.facelets">
+
+    <ui:define name="styles">
+        <h:outputStylesheet library="css" name="stylelibro.css" />
+    </ui:define>
+
+    <ui:define name="contenido">
+        <div class="libros-container">
+            <div class="menu-container">
+                <!-- Menú -->
+                <p:menubar hideDelay="1000" style="margin-bottom: 25px;">
+                    <!-- Inicio -->
+                    <p:menuitem value="#{appmsg.mitem_inicio_libro}" 
+                                outcome="#{loginBean.rol eq 'Administrador' ? '/libros' : '/resenias'}"
+                                icon="pi pi-fw pi-home"
+                                title="#{appmsg.mitem_tit_inicio_libro}"/>
+
+                    <!-- Solo Admin: Submenú de Libros -->
+                    <p:submenu label="#{appmsg.lbl_mi_libro}" 
+                               icon="pi pi-fw pi-book"
+                               rendered="#{loginBean.rol eq 'Administrador'}">
+                        <p:menuitem value="#{appmsg.mi_add_libro}" 
+                                    action="#{libroBean.nuevoLibro}"
+                                    update=":formLibros:formLibro"
+                                    icon="pi pi-fw pi-plus"/>
+                        <p:menuitem value="#{appmsg.mi_del_libro}"
+                                    icon="pi pi-fw pi-trash"
+                                    action="#{libroBean.eliminarLibroSeleccionado}"
+                                    update=":formLibros :growl"
+                                    process="@this">
+                            <p:confirm header="#{appmsg.mi_header_del}"
+                                       message="#{appmsg.confirm_del_libro}"
+                                       icon="pi pi-exclamation-triangle"/>
+                        </p:menuitem>
+                    </p:submenu>
+
+                    <!-- Submenú Reseñas -->
+                    <p:submenu label="#{appmsg.subm_lbl_resenia}" icon="pi pi-fw pi-comments">
+                        <p:menuitem value="#{appmsg.mi_ver_resenia}" 
+                                    outcome="/resenias"
+                                    icon="pi pi-fw pi-list"/>
+
+                        <!-- Solo usuarios pueden añadir reseñas -->
+                        <p:menuitem value="#{appmsg.mi_add_resenia}" 
+                                    outcome="/resenias"
+                                    icon="pi pi-fw pi-pencil"
+                                    rendered="#{loginBean.rol eq 'Usuario'}">
+                            <f:param name="action" value="add"/>
+                        </p:menuitem>
+                    </p:submenu>
+
+                    <!-- Submenú Sugerencias -->
+                    <p:submenu label="#{appmsg.subm_lbl_sug}" icon="pi pi-fw pi-lightbulb">
+                        <p:menuitem value="#{appmsg.mi_autor}" 
+                                    outcome="/sugerencias"
+                                    icon="pi pi-fw pi-user">
+                            <f:param name="tipo" value="autor"/>
+                        </p:menuitem>
+                        <p:menuitem value="#{appmsg.mi_resenia}" 
+                                    outcome="/sugerencias"
+                                    icon="pi pi-fw pi-star">
+                            <f:param name="tipo" value="resenias"/>
+                        </p:menuitem>
+                    </p:submenu>
+
+                    <p:divider layout="vertical"/>
+
+                    <p:menuitem value="#{appmsg.mi_salir}" 
+                                icon="pi pi-fw pi-power-off"
+                                action="#{loginBean.logout}"
+                                title="#{appmsg.tit_mi_salir}"/>
+                </p:menubar>
+            </div>
+            
+            <!--Sección mantenimiento de libros -->
+            <h2 class="section-title">#{appmsg.mt_h2_tit}</h2>
+
+            <!-- Si es admin... -->
+            <h:panelGroup rendered="#{loginBean.rol eq 'Administrador'}">
+
+                <h:form id="formLibros">
+                    <p:focus for="titulo"/>
+                    <!-- Mensaje global -->
+                    <p:growl id="growl"
+                             showDetail="true"
+                             globalOnly="true"
+                             life="6000" />
+
+                    <!-- Formulario Alta/Edición -->
+                    <h:panelGroup id="formLibro"> 
+                        <div class="form-card">
+                            <h3>
+                                #{libroBean.editando ? '✏️ Editar libro' : '📖 Nuevo libro'}
+                            </h3>
+
+                            <div class="form-container">
+
+                                <!-- Título -->
+                                <div class="form-group">
+                                    <p:outputLabel for="titulo" value="#{appmsg.opl_tit_libro}" styleClass="form-label"/>
+                                    <p:inputText id="titulo"
+                                                 value="#{libroBean.libro.nombrelibro}"
+                                                 required="true"
+                                                 requiredMessage="El título es obligatorio"
+                                                 maxlength="100"
+                                                 styleClass="form-input"/>
+                                    <p:message for="titulo" styleClass="error-message"/>
+                                </div>
+
+                                <!-- Autor -->
+                                <div class="form-group">
+                                    <p:outputLabel for="autor" value="#{appmsg.opl_autor_libro}" styleClass="form-label"/>
+                                    <p:inputText id="autor"
+                                                 value="#{libroBean.libro.autor}"
+                                                 required="true"
+                                                 requiredMessage="El autor es obligatorio"
+                                                 maxlength="50"
+                                                 styleClass="form-input"/>
+                                    <p:message for="autor" styleClass="error-message"/>
+                                </div>
+
+                                <!-- Editorial -->
+                                <div class="form-group">
+                                    <p:outputLabel for="tematica" value="#{appmsg.opl_tem_libro}" styleClass="form-label"/>
+                                    <p:inputText id="tematica"
+                                                 value="#{libroBean.libro.tematica}"
+                                                 required="true"
+                                                 requiredMessage="La editorial es obligatoria"
+                                                 maxlength="50"
+                                                 styleClass="form-input"/>
+                                    <p:message for="tematica" styleClass="error-message"/>
+                                </div>
+
+                                <!-- Año -->
+                                <div class="form-group">
+                                    <p:outputLabel for="anio" value="#{appmsg.opl_anio_libro}" styleClass="form-label"/>
+                                    <p:inputText id="anio"
+                                                 value="#{libroBean.libro.aniolibro}"
+                                                 styleClass="form-input">
+                                        <!-- Validación básica para número , esta parte de ajax la cogí del chat porque no me daba de otra forma..-->
+                                        <f:convertNumber integerOnly="true"/>
+                                        <p:ajax event="blur" update="anioMsg"/>
+                                    </p:inputText>
+                                    <p:message for="anio" id="anioMsg" styleClass="error-message"/>
+                                </div>
+
+                                <!-- ISBN -->
+                                <div class="form-group">
+                                    <p:outputLabel for="isbn" value="#{appmsg.opl_isbn_libro}" styleClass="form-label"/>
+                                    <p:inputText id="isbn"
+                                                 value="#{libroBean.libro.isbn}"
+                                                 maxlength="17"
+                                                 placeholder="#{appmsg.ph_isbn_libro}"
+                                                 styleClass="form-input"/>
+                                </div>
+
+                                <!-- Descripción -->
+                                <div class="form-group">
+                                    <p:outputLabel for="descripcion" value="#{appmsg.opl_desc_libro}" styleClass="form-label"/>
+                                    <p:inputTextarea id="descripcion"
+                                                     value="#{libroBean.libro.descripcion}"
+                                                     rows="4"
+                                                     required="true"
+                                                     requiredMessage="La descripción es obligatoria"
+                                                     maxlength="500"
+                                                     styleClass="form-textarea"/>
+                                    <p:message for="descripcion" styleClass="error-message"/>
+                                </div>
+                            </div>
+
+                            <!-- Botones -->
+                            <div class="form-buttons">
+                                <p:commandButton value="#{libroBean.editando ? '💾 Guardar' : '➕ Añadir'}"
+                                                 action="#{libroBean.guardarLibro}"
+                                                 process="@form"
+                                                 update="@form growl"
+                                                 styleClass="btn-primary"/>
+                                <!-- con update @form = el formulario se refresca-->
+                                <p:commandButton value="🆕 #{appmsg.btn_cancelar_libro}"
+                                                 action="#{libroBean.nuevoLibro}"
+                                                 process="@this"
+                                                 update="@form"
+                                                 rendered="#{libroBean.editando}"
+                                                 immediate="true"
+                                                 styleClass="btn-secondary"/>
+                            </div>
+                        </div>
+                    </h:panelGroup>           
+                    <!-- Listado de libros expansión -->
+                    <div class="table-card">
+                        <h3>📋 #{appmsg.tit_h3_listado_libros}</h3>
+                        <p:dataTable var="l" 
+                                     value="#{libroBean.listaLibros}" 
+                                     rowKey="#{l.idlibro}"
+                                     paginator="true"
+                                     rows="5"
+                                     rowsPerPageTemplate="5,10,20"
+                                     stripedRows="true"
+                                     emptyMessage="No hay libros registrados"
+                                     styleClass="books-table">
+
+                            <f:facet name="header">
+                                <div class="table-header">
+                                    <span>#{appmsg.tit_header_exp}</span>
+                                </div>
+                            </f:facet>
+
+                            <p:column style="width:2rem">
+                                <p:rowToggler/>
+                            </p:column>
+
+                            <p:column headerText="#{appmsg.col_tit_libro}" 
+                                      sortBy="#{l.nombrelibro}"
+                                      filterBy="#{l.nombrelibro}"
+                                      filterMatchMode="contains">
+                                <h:outputText value="#{l.nombrelibro}" styleClass="book-title"/>
+                            </p:column>
+
+                            <p:column headerText="#{appmsg.col_autor_libro}"
+                                      sortBy="#{l.autor}"
+                                      filterBy="#{l.autor}"
+                                      filterMatchMode="contains">
+                                <h:outputText value="#{l.autor}"/>
+                            </p:column>
+
+                            <p:column headerText="#{appmsg.col_anio_libro}" 
+                                      sortBy="#{l.aniolibro}"
+                                      filterBy="#{l.aniolibro}"
+                                      filterMatchMode="contains"
+                                      style="width: 80px;">
+                                <h:outputText value="#{l.aniolibro}"/>
+                            </p:column>
+
+                            <p:column headerText="#{appmsg.col_tem_libro}" 
+                                      sortBy="#{l.tematica}"
+                                      filterBy="#{l.tematica}"
+                                      filterMatchMode="contains">
+                                <h:outputText value="#{l.tematica}"/>
+                            </p:column>
+
+                            <p:rowExpansion>
+                                <div class="expansion-content">
+                                    <div class="book-details">
+                                        <div class="book-image-container">
+                                            <!-- Imagen del libro -->
+                                            <h:panelGroup rendered="#{not empty l.imglibro}">
+                                                <p:graphicImage library="img"
+                                                                name="arts/#{l.imglibro.substring(l.imglibro.lastIndexOf('/') + 1)}"
+                                                                width="180"
+                                                                styleClass="book-image"/>
+                                            </h:panelGroup>
+
+                                            <!-- imagen por defecto en el caso de que no se suba alguna -->
+                                            <h:panelGroup rendered="#{empty l.imglibro}">
+                                                <div class="default-image">
+                                                    <span class="default-icon">📚</span>
+                                                    <p>#{appmsg.img_default}</p>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>    
+                                        <div class="book-info">
+                                            <h3 class="book-detail-title">#{l.nombrelibro}</h3>
+                                            <div class="info-grid">
+                                                <div class="info-item">
+                                                    <span class="info-label">#{appmsg.exp_autor}</span>
+                                                    <span class="info-value">#{l.autor}</span>
+                                                </div>
+                                                <div class="info-item">
+                                                    <span class="info-label">#{appmsg.exp_tem}</span>
+                                                    <span class="info-value">#{l.tematica}</span>
+                                                </div>
+                                                <div class="info-item">
+                                                    <span class="info-label">#{appmsg.exp_anio}</span>
+                                                    <span class="info-value">#{l.aniolibro}</span>
+                                                </div>
+                                                <div class="info-item">
+                                                    <span class="info-label">#{appmsg.exp_isbn}</span>
+                                                    <span class="info-value">#{l.isbn}</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="description-container">
+                                                <h4>#{appmsg.exp_desc}</h4>
+                                                <div class="description-text">#{l.descripcion}</div>
+                                            </div>
+
+                                            <div class="action-buttons">
+                                                <!-- oncomplete sirve para subir al formulario cuando elijo la opción de Editar -->
+                                                <p:commandButton value="#{appmsg.btn_edit_exp_libro}"
+                                                                 action="#{libroBean.editarLibro(l)}"
+                                                                 update="@form"
+                                                                 process="@this"
+                                                                 immediate="true"
+                                                                 oncomplete="PrimeFaces.scrollTo('formLibros:formLibro')"
+                                                                 styleClass="btn-edit"
+                                                                 title="#{appmsg.tit_edit_exp_libro}"/>
+
+                                                <p:commandButton value="#{appmsg.btn_del_exp_libro}"
+                                                                 icon="pi pi-trash"
+                                                                 action="#{libroBean.eliminarLibro(l)}"
+                                                                 process="@this"
+                                                                 update=":growl @form"
+                                                                 styleClass="btn-delete"
+                                                                 title="#{appmsg.btn_del_exp_tit_libro}">
+
+                                                    <p:confirm header="#{appmsg.conf_del_exp_libro}"
+                                                               message="¿Eliminar el libro #{l.nombrelibro}?"
+                                                               icon="pi pi-exclamation-triangle"/>
+                                                </p:commandButton>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p:rowExpansion>
+                        </p:dataTable>
+                    </div>
+                </h:form>     
+            </h:panelGroup>
+
+            <!-- Si No es admin... -->
+            <h:panelGroup rendered="#{loginBean.rol ne 'Administrador'}">
+                <div class="access-denied">
+                    <h3>⚠️ #{appmsg.not_admin_h3}</h3>
+                    <p>#{appmsg.not_admin_p}</p>
+                    <p class="user-role">#{appmsg.info_rol}<strong>#{loginBean.rol}</strong></p>
+                </div>
+            </h:panelGroup>
+
+            <div class="export-buttons" style="margin: 1rem 0; display: flex; gap: 1rem; justify-content: flex-end;">
+                <h:form>
+                    <p:commandButton value="#{appmsg.btn_csv}"
+                                     icon="pi pi-download"
+                                     ajax="false"
+                                     title="#{appmsg.tit_btn_csv}">
+                        <p:fileDownload value="#{libroBean.librosCSV}" />
+                    </p:commandButton>
+                </h:form>
+            </div>
+
+            <!-- Botones navegación -->
+            <div class="navigation-buttons">
+                <p:button value="#{appmsg.btn_ir_resenia}"
+                          icon="pi pi-comments"
+                          outcome="/resenias"
+                          styleClass="btn-nav"
+                          title="#{appmsg.tit_btn_ir_resenia}"/>
+
+                <p:commandButton value="#{appmsg.btn_logout_libro}"
+                                 icon="pi pi-sign-out"
+                                 action="#{loginBean.logout}"
+                                 process="@this"
+                                 styleClass="btn-logout"
+                                 title="#{appmsg.tit_btn_logout_libro}"/>
+            </div>
+            <p:confirmDialog global="true"
+                             header="#{appmsg.confi_btn_del}"
+                             showEffect="fade"
+                             hideEffect="fade">
+                <p:commandButton value="#{appmsg.confi_si}"
+                                 type="button"
+                                 styleClass="ui-confirmdialog-yes"
+                                 icon="pi pi-check"/>
+                <p:commandButton value="#{appmsg.confi_no}"
+                                 type="button"
+                                 styleClass="ui-confirmdialog-no"
+                                 icon="pi pi-times"/>
+            </p:confirmDialog>
+        </div>
+    </ui:define>
+</ui:composition>

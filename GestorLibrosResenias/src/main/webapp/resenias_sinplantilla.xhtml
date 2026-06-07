@@ -1,0 +1,294 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <title>Gestión de Reseñas</title>
+        <h:outputStylesheet library="css" name="styleresenias.css"/>
+    </h:head>
+    <f:metadata>
+        <f:viewParam name="libroId" value="#{reseniaBean.libroId}" />
+    </f:metadata>
+
+    <h:body styleClass="resenias-body #{loginBean.rol eq 'Administrador' ? 'tema-admin' : 'tema-usuario'}">
+        <div class="resenias-container">
+
+        <!-- Título cabecera -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1 class="app-title">Gestión de Reseñas</h1>
+
+                <div class="header-user-info">
+                    <span class="user-name">#{loginBean.usuario}</span>
+                    <span class="user-role">(#{loginBean.rol})</span>
+                </div>
+            </div>
+        </header>
+            
+            <h:form id="formResenias">
+                <!-- Menú -->
+                <div class="menu-container">
+                    <p:menubar hideDelay="1000" style="margin-bottom: 25px;">
+                        <!-- Inicio -->
+                        <p:menuitem value="Inicio" 
+                                   outcome="#{loginBean.rol eq 'Administrador' ? '/libros' : '/resenias'}"
+                                   icon="pi pi-fw pi-home"/>
+                        
+                        <!-- Submenú Libros solo para admin -->
+                        <p:submenu label="Libros" 
+                                  icon="pi pi-fw pi-book"
+                                  rendered="#{loginBean.rol eq 'Administrador'}">
+                            <p:menuitem value="Añadir libro" 
+                                       outcome="/libros"
+                                       icon="pi pi-fw pi-plus"/>
+                            <p:menuitem value="Eliminar libro" 
+                                       outcome="/libros"
+                                       icon="pi pi-fw pi-trash"/>
+                        </p:submenu>
+                        
+                        <!-- Submenú Reseñas -->
+                        <p:submenu label="Reseñas" 
+                                  icon="pi pi-fw pi-comments">
+                            <p:menuitem value="Ver reseñas" 
+                                       outcome="/resenias"
+                                       icon="pi pi-fw pi-eye"/>
+                            
+                            <!-- Solo usuarios pueden añadir reseñas -->
+                            <p:menuitem value="Añadir reseña" 
+                                       action="#{reseniaBean.prepararNuevaResenia}"
+                                       update="@form"
+                                       icon="pi pi-fw pi-pencil"
+                                       rendered="#{loginBean.rol ne 'Administrador'}"
+                                       styleClass="#{not empty reseniaBean.libroSeleccionado ? '' : 'disabled-link'}"/>
+                        </p:submenu>
+                        
+                        <!-- Submenú Sugerencias -->
+                        <p:submenu label="Sugerencias" 
+                                  icon="pi pi-fw pi-lightbulb">
+                            <p:menuitem value="Por autor" 
+                                       outcome="/sugerencias"
+                                       icon="pi pi-fw pi-user">
+                                <f:param name="tipo" value="autor"/>
+                            </p:menuitem>
+                            <p:menuitem value="Por reseñas" 
+                                       outcome="/sugerencias"
+                                       icon="pi pi-fw pi-star">
+                                <f:param name="tipo" value="resenias"/>
+                            </p:menuitem>
+                        </p:submenu>
+                        
+                        <p:divider layout="vertical"/>
+                        
+                        <!-- Cerrar sesión -->
+                        <p:menuitem value="Salir" 
+                                   icon="pi pi-fw pi-power-off"
+                                   action="#{loginBean.logout}"/>
+                    </p:menubar>
+                </div>
+
+                <!-- mensajes globales -->
+                <p:growl id="growl" showDetail="true" globalOnly="true" life="6000"/>
+
+                <!-- Tabla libros -->
+                <h:panelGroup id="panelLibros" layout="block" styleClass="table-card">
+                    <h2>📘Libros Disponibles</h2>
+
+                    <p:dataTable id="tablaLibros"
+                                 value="#{libroBean.listaLibros}" var="libro"
+                                 paginator="true" rows="5"
+                                 emptyMessage="No hay libros disponibles"
+                                 styleClass="books-table">
+
+                        <p:column headerText="Título">
+                            <strong>#{libro.nombrelibro}</strong><br/>
+                            <small>Autor: #{libro.autor}</small>
+                        </p:column>
+
+                        <p:column headerText="Editorial">
+                            #{libro.tematica}
+                        </p:column>
+
+                        <p:column headerText="Reseñas" styleClass="col-small"> 
+                            #{reseniaBean.contarResenias(libro.idlibro)} reseñas 
+                        </p:column>
+
+                        <p:column headerText="Acciones" styleClass="col-actions">
+                            <div class="actions-container">
+
+                                <p:commandLink value="Ver reseñas"
+                                               action="#{reseniaBean.verResenias(libro)}"
+                                               update=":formResenias:reseniasPanel"
+                                               process="@this"
+                                               oncomplete="PrimeFaces.scrollTo('formResenias:reseniasPanel')"
+                                               styleClass="link-action"
+                                               title="Ver reseñas de este libro"/>
+
+                                <p:commandLink value="Añadir reseña"
+                                               action="#{reseniaBean.nuevaResenia(libro)}"
+                                               update=":formResenias:formPanel"
+                                               process="@this"
+                                               oncomplete="PrimeFaces.scrollTo('formResenias:formPanel')"
+                                               rendered="#{loginBean.rol ne 'Administrador'}"
+                                               styleClass="link-action"
+                                               title="Añadir nueva reseña"/>
+
+                                <h:link value="Otros títulos"
+                                        outcome="/sugerencias"
+                                        styleClass="link-action"
+                                        title="Ver otros libros del mismo autor">
+                                    <f:param name="autor" value="#{libro.autor}"/>
+                                    <f:param name="tipo" value="autor"/>
+                                </h:link>
+
+                            </div>
+                        </p:column>
+
+                    </p:dataTable>
+                </h:panelGroup>
+
+
+                <!-- Panel reseñas -->
+                <h:panelGroup id="reseniasPanel" layout="block"
+                              style="display: #{reseniaBean.libroSeleccionado != null ? 'block' : 'none'}">
+
+                    <div class="table-card">
+                        <h3>
+                            📝 Reseñas del libro:
+                            <span class="title-highlight">
+                                #{reseniaBean.libroSeleccionado.nombrelibro}
+                            </span>
+                        </h3>
+
+                        <p:dataTable value="#{reseniaBean.listaReseniasPorLibro}" var="r"
+                                     emptyMessage="No hay reseñas para este libro"
+                                     styleClass="reviews-table">
+
+                            <p:column headerText="Usuario">
+                                Usuario #{r.idusu}
+                            </p:column>
+
+                            <p:column headerText="Título">
+                                #{r.titulores}
+                            </p:column>
+
+                            <p:column headerText="Puntuación" styleClass="col-medium">
+                                <p:rating value="#{r.puntosres}" readonly="true" stars="5"/>
+                                <span class="rating-text">#{r.puntosres}/10</span>
+                            </p:column>
+
+                            <p:column headerText="Fecha" styleClass="col-small">
+                                <h:outputText value="#{r.fechares}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Contenido">
+                                <div class="review-content">
+                                    #{r.contenidores}
+                                </div>
+                            </p:column>
+
+                        </p:dataTable>
+
+                        <!--Botón Sugerencias reseñas -->
+                        <h:panelGroup rendered="#{not empty reseniaBean.listaReseniasPorLibro}">
+                            <div class="suggestions-container" style="display: flex; justify-content: center; width: 100%; margin: 25px 0;">
+                                <p:button value="💡 Sugerencias por reseñas"
+                                          outcome="/sugerencias"
+                                          styleClass="btn-suggest"
+                                          title="Ver sugerencias basadas en reseñas">
+                                    <f:param name="libroId"
+                                             value="#{reseniaBean.libroSeleccionado.idlibro}"/>
+                                    <f:param name="tipo" value="resenias"/>
+                                </p:button>
+                            </div>
+                        </h:panelGroup>
+
+                    </div>
+                </h:panelGroup>
+
+                <!-- Formulario reseña -->
+                <h:panelGroup id="formPanel" layout="block"
+                              style="display: #{reseniaBean.mostrarFormulario ? 'block' : 'none'}">
+
+                    <div class="form-card">
+                        <h3>
+                            ✍️ Nueva Reseña para:
+                            <span class="title-highlight-blue">
+                                #{reseniaBean.libroSeleccionado.nombrelibro}
+                            </span>
+                        </h3>
+
+                        <h:panelGrid columns="3" styleClass="form-grid">
+
+                            <h:outputLabel for="tituloResenia" value="Título *" styleClass="form-label"/>
+                            <h:inputText id="tituloResenia"
+                                         value="#{reseniaBean.resenia.titulores}"
+                                         required="true"
+                                         styleClass="form-input"/>
+                            <h:message for="tituloResenia" styleClass="error-message"/>
+
+                            <h:outputLabel for="puntuacion" value="Puntuación (1-10) *" styleClass="form-label"/>
+                            <h:selectOneMenu id="puntuacion"
+                                             value="#{reseniaBean.resenia.puntosres}"
+                                             required="true"
+                                             styleClass="form-input">
+                                <f:selectItem itemLabel="Selecciona..." noSelectionOption="true"/>
+                                <f:selectItems value="#{reseniaBean.puntuacionesDisponibles}"/>
+                            </h:selectOneMenu>
+                            <h:message for="puntuacion" styleClass="error-message"/>
+
+                            <h:outputLabel for="contenido" value="Contenido *" styleClass="form-label"/>
+                            <h:inputTextarea id="contenido"
+                                             value="#{reseniaBean.resenia.contenidores}"
+                                             rows="5"
+                                             required="true"
+                                             styleClass="form-textarea"/>
+                            <h:message for="contenido" styleClass="error-message"/>
+
+                        </h:panelGrid>
+
+                        <div class="form-buttons">
+                            <h:commandButton value="💾 Guardar Reseña"
+                                             action="#{reseniaBean.guardarResenia}"
+                                             styleClass="btn-primary"/>
+                            <p:commandButton value="❌ Cancelar"
+                                             action="#{reseniaBean.cancelarResenia}"
+                                             immediate="true"
+                                             process="@this"
+                                             update=":formResenias"
+                                             styleClass="btn-secondary"/>
+                        </div>
+                    </div>
+                </h:panelGroup>
+
+                <div class="navigation-buttons">
+                    <p:button value="Inicio"
+                              icon="pi pi-home"
+                              outcome="#{loginBean.rol eq 'Administrador' ? '/libros' : '/resenias'}"
+                              styleClass="btn-nav"/>
+                    <p:commandButton value="Cerrar sesión"
+                                     icon="pi pi-sign-out"
+                                     action="#{loginBean.logout}"
+                                     process="@this"
+                                     styleClass="btn-logout"/>
+                </div>
+
+            </h:form>
+        </div>
+        <!-- PIE DE PÁGINA -->
+        <footer class="pie-pagina">
+            <div class="footer-content">
+                <span>&copy; 2026 | Gestor de Libros y Reseñas</span>
+
+                <p:link outcome="/ayuda"
+                               value="📖 Ayuda"
+                               styleClass="help-link"/>
+            </div>
+        </footer>
+    </h:body>
+</html>

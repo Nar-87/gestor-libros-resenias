@@ -1,0 +1,359 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <title>Mantenimiento de Libros</title>
+        <h:outputStylesheet library="css" name="stylelibros.css" />
+    </h:head>
+
+    <h:body styleClass="libros-body #{loginBean.rol eq 'Administrador' ? 'tema-admin' : 'tema-usuario'}">
+        <div class="libros-container">
+
+        <!-- Título cabecera -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1 class="app-title">Gestor de Libros y Reseñas</h1>
+
+                <div class="header-user-info">
+                    <span class="user-name">#{loginBean.usuario}</span>
+                    <span class="user-role">(#{loginBean.rol})</span>
+                </div>
+            </div>
+        </header>
+            <!-- Menú -->
+            <div class="menu-container">
+                <p:menubar hideDelay="1000" style="margin-bottom: 25px;">
+                    <!-- Inicio -->
+                    <p:menuitem value="Inicio" 
+                                outcome="#{loginBean.rol eq 'Administrador' ? '/libros' : '/resenias'}"
+                                icon="pi pi-fw pi-home"/>
+
+                    <!-- Solo Admin: Submenú de Libros -->
+                    <p:submenu label="Libros" 
+                               icon="pi pi-fw pi-book"
+                               rendered="#{loginBean.rol eq 'Administrador'}">
+                        <p:menuitem value="Añadir libro" 
+                                    action="#{libroBean.nuevoLibro}"
+                                    update=":formLibros:formLibro"
+                                    icon="pi pi-fw pi-plus"/>
+                        <p:menuitem value="Eliminar libro"  
+                                    icon="pi pi-fw pi-trash"
+                                    title="Usa el botón Eliminar en cada libro"/>
+                    </p:submenu>
+
+                    <!-- Submenú Reseñas -->
+                    <p:submenu label="Reseñas" icon="pi pi-fw pi-comments">
+                        <p:menuitem value="Ver reseñas" 
+                                    outcome="/resenias"
+                                    icon="pi pi-fw pi-list"/>
+
+                        <!-- Solo usuarios pueden añadir reseñas -->
+                        <p:menuitem value="Añadir reseña" 
+                                    outcome="/resenias"
+                                    icon="pi pi-fw pi-pencil"
+                                    rendered="#{loginBean.rol eq 'Usuario'}">
+                            <f:param name="action" value="add"/>
+                        </p:menuitem>
+                    </p:submenu>
+
+                    <!-- Submenú Sugerencias -->
+                    <p:submenu label="Sugerencias" icon="pi pi-fw pi-lightbulb">
+                        <p:menuitem value="Por autor" 
+                                    outcome="/sugerencias"
+                                    icon="pi pi-fw pi-user">
+                            <f:param name="tipo" value="autor"/>
+                        </p:menuitem>
+                        <p:menuitem value="Por reseñas" 
+                                    outcome="/sugerencias"
+                                    icon="pi pi-fw pi-star">
+                            <f:param name="tipo" value="resenias"/>
+                        </p:menuitem>
+                    </p:submenu>
+
+                    <p:divider layout="vertical"/>
+
+                    <p:menuitem value="Salir" 
+                                icon="pi pi-fw pi-power-off"
+                                action="#{loginBean.logout}"/>
+                </p:menubar>
+            </div>
+            
+            <!--Sección mantenimiento de libros -->
+            <h2 class="section-title">Mantenimiento de Libros</h2>
+
+            <!-- Si es admin... -->
+            <h:panelGroup rendered="#{loginBean.rol eq 'Administrador'}">
+
+                <h:form id="formLibros">
+                    <p:focus for="titulo"/>
+                    <!-- Mensaje global -->
+                    <p:growl id="growl"
+                             showDetail="true"
+                             globalOnly="true"
+                             life="6000" />
+
+                    <!-- Formulario Alta/Edición -->
+                    <h:panelGroup id="formLibro"> 
+                        <div class="form-card">
+                            <h3>
+                                #{libroBean.editando ? '✏️ Editar libro' : '📖 Nuevo libro'}
+                            </h3>
+
+                            <div class="form-container">
+
+                                <!-- Título -->
+                                <div class="form-group">
+                                    <p:outputLabel for="titulo" value="Título *" styleClass="form-label"/>
+                                    <p:inputText id="titulo"
+                                                 value="#{libroBean.libro.nombrelibro}"
+                                                 required="true"
+                                                 requiredMessage="El título es obligatorio"
+                                                 styleClass="form-input"/>
+                                    <p:message for="titulo" styleClass="error-message"/>
+                                </div>
+
+                                <!-- Autor -->
+                                <div class="form-group">
+                                    <p:outputLabel for="autor" value="Autor *" styleClass="form-label"/>
+                                    <p:inputText id="autor"
+                                                 value="#{libroBean.libro.autor}"
+                                                 required="true"
+                                                 requiredMessage="El autor es obligatorio"
+                                                 styleClass="form-input"/>
+                                    <p:message for="autor" styleClass="error-message"/>
+                                </div>
+
+                                <!-- Editorial -->
+                                <div class="form-group">
+                                    <p:outputLabel for="tematica" value="Editorial *" styleClass="form-label"/>
+                                    <p:inputText id="tematica"
+                                                 value="#{libroBean.libro.tematica}"
+                                                 required="true"
+                                                 requiredMessage="La editorial es obligatoria"
+                                                 styleClass="form-input"/>
+                                    <p:message for="tematica" styleClass="error-message"/>
+                                </div>
+
+                                <!-- Año -->
+                                <div class="form-group">
+                                    <p:outputLabel for="anio" value="Año" styleClass="form-label"/>
+                                    <p:inputText id="anio"
+                                                 value="#{libroBean.libro.aniolibro}"
+                                                 styleClass="form-input">
+                                        <f:convertNumber integerOnly="true"/>
+                                    </p:inputText>
+                                    <p:message for="anio" styleClass="error-message"/>
+                                </div>
+
+                                <!-- ISBN -->
+                                <div class="form-group">
+                                    <p:outputLabel for="isbn" value="ISBN" styleClass="form-label"/>
+                                    <p:inputText id="isbn"
+                                                 value="#{libroBean.libro.isbn}"
+                                                 styleClass="form-input"/>
+                                </div>
+
+                                <!-- Imagen -->
+                                <div class="form-group">
+                                    <p:outputLabel for="imagen" value="Ruta imagen" styleClass="form-label"/>
+                                    <p:inputText id="imagen"
+                                                 value="#{libroBean.libro.imglibro}"
+                                                 placeholder="img/arts/imagen.jpg"
+                                                 styleClass="form-input"/>
+                                </div>
+
+                                <!-- Descripción -->
+                                <div class="form-group">
+                                    <p:outputLabel for="descripcion" value="Descripción *" styleClass="form-label"/>
+                                    <p:inputTextarea id="descripcion"
+                                                     value="#{libroBean.libro.descripcion}"
+                                                     rows="4"
+                                                     required="true"
+                                                     requiredMessage="La descripción es obligatoria"
+                                                     styleClass="form-textarea"/>
+                                    <p:message for="descripcion" styleClass="error-message"/>
+                                </div>
+
+                            </div>
+
+                            <!-- Botones -->
+                            <div class="form-buttons">
+                                <p:commandButton value="#{libroBean.editando ? '💾 Guardar' : '➕ Añadir'}"
+                                                 action="#{libroBean.guardarLibro}"
+                                                 process="@form"
+                                                 update="@form growl"
+                                                 styleClass="btn-primary"/>
+                                <!-- con update @form = el formulario se refresca-->
+                                <p:commandButton value="🆕 Cancelar"
+                                                 action="#{libroBean.nuevoLibro}"
+                                                 process="@this"
+                                                 update="@form"
+                                                 rendered="#{libroBean.editando}"
+                                                 immediate="true"
+                                                 styleClass="btn-secondary"/>
+                            </div>
+                        </div>
+                    </h:panelGroup>           
+                    <!-- Listado de libros expansión -->
+                    <div class="table-card">
+                        <h3>📋 Listado de Libros</h3>
+                        <p:dataTable var="l" 
+                                     value="#{libroBean.listaLibros}" 
+                                     rowKey="#{l.idlibro}"
+                                     paginator="true"
+                                     rows="5"
+                                     rowsPerPageTemplate="5,10,20"
+                                     stripedRows="true"
+                                     emptyMessage="No hay libros registrados"
+                                     styleClass="books-table">
+
+                            <f:facet name="header">
+                                <div class="table-header">
+                                    <span>Expandir filas para ver información detallada</span>
+                                </div>
+                            </f:facet>
+
+                            <p:column style="width:2rem">
+                                <p:rowToggler/>
+                            </p:column>
+
+                            <p:column headerText="Título">
+                                <h:outputText value="#{l.nombrelibro}" styleClass="book-title"/>
+                            </p:column>
+
+                            <p:column headerText="Autor">
+                                <h:outputText value="#{l.autor}"/>
+                            </p:column>
+
+                            <p:column headerText="Año" style="width: 80px;">
+                                <h:outputText value="#{l.aniolibro}"/>
+                            </p:column>
+
+                            <p:column headerText="Editorial">
+                                <h:outputText value="#{l.tematica}"/>
+                            </p:column>
+
+                            <p:rowExpansion>
+                                <div class="expansion-content">
+                                    <div class="book-details">
+                                        <div class="book-image-container">
+                                            <!-- Imagen del libro -->
+                                            <h:panelGroup rendered="#{not empty l.imglibro}">
+                                                <p:graphicImage library="img"
+                                                                name="arts/#{l.imglibro.substring(l.imglibro.lastIndexOf('/') + 1)}"
+                                                                width="180"
+                                                                styleClass="book-image"/>
+                                            </h:panelGroup>
+
+                                            <!-- imagen por defecto en el caso de que no se suba alguna -->
+                                            <h:panelGroup rendered="#{empty l.imglibro}">
+                                                <div class="default-image">
+                                                    <span class="default-icon">📚</span>
+                                                    <p>Sin imagen</p>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>    
+                                        <div class="book-info">
+                                            <h3 class="book-detail-title">#{l.nombrelibro}</h3>
+                                            <div class="info-grid">
+                                                <div class="info-item">
+                                                    <span class="info-label">Autor:</span>
+                                                    <span class="info-value">#{l.autor}</span>
+                                                </div>
+                                                <div class="info-item">
+                                                    <span class="info-label">Editorial:</span>
+                                                    <span class="info-value">#{l.tematica}</span>
+                                                </div>
+                                                <div class="info-item">
+                                                    <span class="info-label">Año:</span>
+                                                    <span class="info-value">#{l.aniolibro}</span>
+                                                </div>
+                                                <div class="info-item">
+                                                    <span class="info-label">ISBN:</span>
+                                                    <span class="info-value">#{l.isbn}</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="description-container">
+                                                <h4>Descripción:</h4>
+                                                <div class="description-text">#{l.descripcion}</div>
+                                            </div>
+
+                                            <div class="action-buttons">
+                                                <!-- oncomplete sirve para subir al formulario cuando elijo la opción de Editar -->
+                                                <p:commandButton value="Editar"
+                                                                 action="#{libroBean.editarLibro(l)}"
+                                                                 update="@form"
+                                                                 process="@this"
+                                                                 immediate="true"
+                                                                 oncomplete="PrimeFaces.scrollTo('formLibros:formLibro')"
+                                                                 styleClass="btn-edit"/>
+
+                                                <p:commandButton value="Eliminar"
+                                                                 icon="pi pi-trash"
+                                                                 action="#{libroBean.eliminarLibro(l)}"
+                                                                 process="@this"
+                                                                 update="@form"
+                                                                 styleClass="btn-delete"
+                                                                 immediate="true"
+                                                                 onclick="return confirm('¿Eliminar el libro #{l.nombrelibro}?')"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p:rowExpansion>
+                        </p:dataTable>
+                    </div>
+                </h:form>     
+            </h:panelGroup>
+
+            <!-- Si No es admin... -->
+            <h:panelGroup rendered="#{loginBean.rol ne 'Administrador'}">
+                <div class="access-denied">
+                    <h3>⚠️ Acceso Restringido</h3>
+                    <p>Solo los administradores pueden gestionar libros.</p>
+                    <p class="user-role">Tu rol actual es: <strong>#{loginBean.rol}</strong></p>
+                </div>
+            </h:panelGroup>
+            
+            <div class="export-buttons" style="margin: 1rem 0; display: flex; gap: 1rem; justify-content: flex-end;">
+                <p:commandButton value="Exportar CSV" 
+                                 action="#{libroBean.exportarLibrosCSV}"
+                                 ajax="false"
+                                 icon="pi pi-download"
+                                 styleClass="btn-export">
+                    <p:fileDownload value="#{libroBean.exportarLibrosCSV}" />
+                </p:commandButton>
+            </div>
+
+            <!-- Botones navegación -->
+            <div class="navigation-buttons">
+                <p:button value="Gestionar reseñas"
+                          icon="pi pi-comments"
+                          outcome="/resenias"
+                          styleClass="btn-nav"/>
+
+                <p:commandButton value="Cerrar sesión"
+                                 icon="pi pi-sign-out"
+                                 action="#{loginBean.logout}"
+                                 process="@this"
+                                 styleClass="btn-logout"/>
+            </div>
+        </div>
+        <!-- PIE DE PÁGINA -->
+        <footer class="pie-pagina">
+            <div class="footer-content">
+                <span>&copy; 2026 | Gestor de Libros y Reseñas</span>
+
+                <p:link outcome="/ayuda"
+                               value="📖 Ayuda"
+                               styleClass="help-link"/>
+            </div>
+        </footer>
+    </h:body>
+</html>

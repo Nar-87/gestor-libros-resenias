@@ -1,0 +1,242 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="jakarta.faces.core">
+
+    <h:head>
+        <title>Sugerencias de lectura</title>
+        <h:outputStylesheet library="css" name="stylesugerencias.css" />
+    </h:head>
+
+    <h:body styleClass="body-contenido #{loginBean.rol eq 'Administrador' ? 'tema-admin' : 'tema-usuario'}">
+        <div class="contenedor-principal">
+
+        <!-- Título cabecera -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1 class="app-title">Sugerencias de Lectura</h1>
+
+                <div class="header-user-info">
+                    <span class="user-name">#{loginBean.usuario}</span>
+                    <span class="user-role">(#{loginBean.rol})</span>
+                </div>
+            </div>
+        </header>
+        
+            <h:form id="formSugerencias">    
+                <!-- Menú-->
+                <div class="menu-container">
+                    <p:menubar hideDelay="1000" style="margin-bottom: 25px;">
+                        <!-- Inicio -->
+                        <p:menuitem value="Inicio" 
+                                   outcome="#{loginBean.rol eq 'Administrador' ? '/libros' : '/resenias'}"
+                                   icon="pi pi-fw pi-home"/>
+                        
+                        <!-- Submenú Libros solo para admin -->
+                        <p:submenu label="Libros" 
+                                  icon="pi pi-fw pi-book"
+                                  rendered="#{loginBean.rol eq 'Administrador'}">
+                            <p:menuitem value="Añadir libro" 
+                                       outcome="/libros"
+                                       icon="pi pi-fw pi-plus"/>
+                            <p:menuitem value="Eliminar libro" 
+                                       outcome="/libros"
+                                       icon="pi pi-fw pi-trash"/>
+                        </p:submenu>
+                        
+                        <!-- Submenú Reseñas -->
+                        <p:submenu label="Reseñas" 
+                                  icon="pi pi-fw pi-comments">
+                            <p:menuitem value="Ver reseñas" 
+                                       outcome="/resenias"
+                                       icon="pi pi-fw pi-eye"/>
+                            
+                            <!-- Solo usuarios pueden añadir reseñas -->
+                            <p:menuitem value="Añadir reseña" 
+                                       outcome="/resenias"
+                                       icon="pi pi-fw pi-pencil"
+                                       rendered="#{loginBean.rol ne 'Administrador'}"/>
+                        </p:submenu>
+                        
+                        <!-- Submenú Sugerencias -->
+                        <p:submenu label="Sugerencias" 
+                                  icon="pi pi-fw pi-lightbulb"
+                                  styleClass="active-menu">
+                            <p:menuitem value="Por autor" 
+                                       outcome="/sugerencias"
+                                       icon="pi pi-fw pi-user">
+                                <f:param name="tipo" value="autor"/>
+                            </p:menuitem>
+                            <p:menuitem value="Por reseñas" 
+                                       outcome="/sugerencias"
+                                       icon="pi pi-fw pi-star">
+                                <f:param name="tipo" value="resenias"/>
+                            </p:menuitem>
+                        </p:submenu>
+                        
+                        <p:divider layout="vertical"/>
+                        
+                        <!-- Cerrar sesión -->
+                        <p:menuitem value="Salir" 
+                                   icon="pi pi-fw pi-power-off"
+                                   action="#{loginBean.logout}"/>
+                    </p:menubar>
+                </div>
+
+                <!-- mensajes globales -->
+                <p:growl id="growl" showDetail="true" life="5000"/>
+
+                <h:messages globalOnly="true" styleClass="mensajes-globales"/>
+
+                <!-- Mensaje de contexto -->
+                <div class="tarjeta" rendered="#{not empty sugerenciaBean.mensajeSugerencia}">
+                    <h3>#{sugerenciaBean.mensajeSugerencia}</h3>
+                </div>
+
+                <!-- Sugerencias por autor -->
+                <h:panelGroup rendered="#{sugerenciaBean.tipoSugerencia eq 'autor'}">
+                    <div class="tarjeta">
+                        <h3>
+                            📚 Otros libros del autor:
+                            <span style="color:#9C27B0">
+                                #{sugerenciaBean.autorSeleccionado}
+                            </span>
+                        </h3>
+
+                        <p:dataTable value="#{sugerenciaBean.librosSugeridos}"
+                                     var="libro"
+                                     paginator="true"
+                                     rows="5"
+                                     emptyMessage="No hay más libros de este autor"
+                                     styleClass="tabla-contenido">
+
+                            <p:column headerText="Título">
+                                <strong>#{libro.nombrelibro}</strong>
+                            </p:column>
+
+                            <p:column headerText="Año">
+                                #{libro.aniolibro}
+                            </p:column>
+
+                            <p:column headerText="Editorial">
+                                #{libro.tematica}
+                            </p:column>
+
+                            <p:column headerText="Acciones">
+                                <p:commandButton value="Ver reseñas"
+                                                 action="#{reseniaBean.verReseniasYRedirigir(libro)}"
+                                                 process="@this"
+                                                 styleClass="boton boton-info boton-pequeno"
+                                                 title="Ver reseñas de este libro"/>
+                            </p:column>
+
+                        </p:dataTable>
+                    </div>
+                </h:panelGroup>
+
+                <!-- Sugerencias por reseñas -->
+                <h:panelGroup rendered="#{sugerenciaBean.tipoSugerencia eq 'resenias'}">
+                    <div class="tarjeta">
+                        <h3>⭐ Libros recomendados basados en reseñas similares</h3>
+
+                        <p>
+                            Usuarios que reseñaron
+                            <strong>#{sugerenciaBean.libroBase.nombrelibro}</strong>
+                            también valoraron positivamente:
+                        </p>
+
+                        <p:dataTable value="#{sugerenciaBean.librosSugeridos}"
+                                     var="libro"
+                                     paginator="true"
+                                     rows="5"
+                                     emptyMessage="No hay sugerencias basadas en reseñas"
+                                     styleClass="tabla-contenido">
+
+                            <p:column headerText="Título">
+                                <strong>#{libro.nombrelibro}</strong><br/>
+                                <small>Autor: #{libro.autor}</small>
+                            </p:column>
+
+                            <p:column headerText="Editorial">
+                                #{libro.tematica}
+                            </p:column>
+
+                            <p:column headerText="Año">
+                                #{libro.aniolibro}
+                            </p:column>
+
+                            <p:column headerText="Acciones">
+                                <p:commandButton value="Ver reseñas"
+                                                 action="#{reseniaBean.verReseniasYRedirigir(libro)}"
+                                                 process="@this"
+                                                 styleClass="boton boton-info boton-pequeno"
+                                                 title="Ver reseñas de este libro"/>
+                            </p:column>
+
+                        </p:dataTable>
+                    </div>
+                </h:panelGroup>
+
+                <!-- Sin sugerencias seleccionadas -->
+                <div class="tarjeta"
+                     rendered="#{empty sugerenciaBean.tipoSugerencia}">
+                    <h3>🎯 ¿Cómo obtener sugerencias?</h3>
+
+                    <div style="display: flex; gap: 30px; align-items: center; margin-top: 20px;">
+                        <div style="flex: 1; text-align: center;">
+                            <div style="font-size: 3rem; margin-bottom: 10px;">📖</div>
+                            <h4>Por autor</h4>
+                            <p>
+                                Ve a la página de <strong>Reseñas</strong> →<br/>
+                                Haz clic en <strong>"Otros títulos"</strong>
+                            </p>
+                        </div>
+
+                        <div style="flex: 1; text-align: center;">
+                            <div style="font-size: 3rem; margin-bottom: 10px;">💡</div>
+                            <h4>Por reseñas similares</h4>
+                            <p>
+                                Ve a la página de <strong>Reseñas</strong> →<br/>
+                                Selecciona un libro →<br/>
+                                Haz clic en <strong>"Sugerencias por reseñas"</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones navegación -->
+                <div class="contenedor-navegacion">
+                    <p:button value="Inicio"
+                              icon="pi pi-home"
+                              outcome="#{loginBean.rol eq 'Administrador' ? '/libros' : '/resenias'}"
+                              styleClass="boton-navegacion boton-inicio"/>
+
+                    <p:button value="Reseñas"
+                              icon="pi pi-comments"
+                              outcome="/resenias"
+                              styleClass="boton-navegacion boton-secundario"/>
+
+                    <p:commandButton value="Cerrar sesión"
+                                     icon="pi pi-sign-out"
+                                     action="#{loginBean.logout}"
+                                     process="@this"
+                                     styleClass="boton-navegacion boton-logout"/>
+                </div>
+
+            </h:form>
+        </div>
+        <!-- PIE DE PÁGINA -->
+        <footer class="pie-pagina">
+            <div class="footer-content">
+                <span>&copy; 2026 | Gestor de Libros y Reseñas</span>
+
+                <p:link outcome="/ayuda"
+                               value="📖 Ayuda"
+                               styleClass="help-link"/>
+            </div>
+        </footer>
+    </h:body>
+</html>

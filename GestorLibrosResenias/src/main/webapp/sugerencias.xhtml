@@ -1,0 +1,231 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/plantilla/plantilla.xhtml" 
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="jakarta.faces.facelets">
+
+    <ui:define name="styles">
+        <h:outputStylesheet library="css" name="stylesugerencias.css" />
+    </ui:define>
+
+    <ui:define name="contenido">
+        <div class="contenedor-principal">
+            <h:form id="formSugerencias">    
+                <!-- Menú-->
+                <div class="menu-container">
+                    <p:menubar hideDelay="1000" style="margin-bottom: 25px;">
+                        <!-- Inicio -->
+                        <p:menuitem value="#{appmsg.mitem_inicio_sug}" 
+                                    outcome="#{loginBean.rol eq 'Administrador' ? '/libros' : '/resenias'}"
+                                    icon="pi pi-fw pi-home"
+                                    title="#{appmsg.tit_mitem_inicio_sug}"/>
+
+                        <!-- Submenú Libros solo para admin -->
+                        <p:submenu label="#{appmsg.subm_lbl_sug}" 
+                                   icon="pi pi-fw pi-book"
+                                   rendered="#{loginBean.rol eq 'Administrador'}">
+                            <p:menuitem value="#{appmsg.mitem_add_lib_sug }" 
+                                        outcome="/libros"
+                                        icon="pi pi-fw pi-plus"/>
+                            <p:menuitem value="#{appmsg.mitem_del_li_sug}" 
+                                        outcome="/libros"
+                                        icon="pi pi-fw pi-trash"/>
+                        </p:submenu>
+
+                        <!-- Submenú Reseñas -->
+                        <p:submenu label="#{appmsg.subm_res_sug}" 
+                                   icon="pi pi-fw pi-comments">
+                            <p:menuitem value="#{appmsg.mitem_ver_res_sug}" 
+                                        outcome="/resenias"
+                                        icon="pi pi-fw pi-eye"/>
+
+                            <!-- Solo usuarios pueden añadir reseñas -->
+                            <p:menuitem value="#{appmsg.mitem_add_res_sug}" 
+                                        outcome="/resenias"
+                                        icon="pi pi-fw pi-pencil"
+                                        rendered="#{loginBean.rol ne 'Administrador'}"/>
+                        </p:submenu>
+
+                        <!-- Submenú Sugerencias -->
+                        <p:submenu label="#{appmsg.subm_sug_sug}" 
+                                   icon="pi pi-fw pi-lightbulb"
+                                   styleClass="active-menu">
+                            <p:menuitem value="#{appmsg.mitem_autor_sug}" 
+                                        outcome="/sugerencias"
+                                        icon="pi pi-fw pi-user">
+                                <f:param name="tipo" value="autor"/>
+                            </p:menuitem>
+                            <p:menuitem value="#{appmsg.mitem_res_sug}" 
+                                        outcome="/sugerencias"
+                                        icon="pi pi-fw pi-star">
+                                <f:param name="tipo" value="resenias"/>
+                            </p:menuitem>
+                        </p:submenu>
+
+                        <p:divider layout="vertical"/>
+
+                        <!-- Cerrar sesión -->
+                        <p:menuitem value="#{appmsg.mitem_out_sug}" 
+                                    icon="pi pi-fw pi-power-off"
+                                    action="#{loginBean.logout}"
+                                    title="#{appmsg.tit_mitem_out_sug}"/>
+                    </p:menubar>
+                </div>
+
+                <!-- mensajes globales -->
+                <p:growl id="growl" showDetail="true" life="5000"/>
+
+                <h:messages globalOnly="true" styleClass="mensajes-globales"/>
+
+                <!-- Mensaje de contexto -->
+                <div class="tarjeta" rendered="#{not empty sugerenciaBean.mensajeSugerencia}">
+                    <h3>#{sugerenciaBean.mensajeSugerencia}</h3>
+                </div>
+
+                <!-- Sugerencias por autor -->
+                <h:panelGroup rendered="#{sugerenciaBean.tipoSugerencia eq 'autor'}">
+                    <div class="tarjeta">
+                        <h3>
+                            📚 #{appmsg.tit_sug_autor}
+                            <span style="color:#9C27B0">
+                                #{sugerenciaBean.autorSeleccionado}
+                            </span>
+                        </h3>
+
+                        <p:dataTable value="#{sugerenciaBean.librosSugeridos}"
+                                     var="libro"
+                                     paginator="true"
+                                     rows="5"
+                                     emptyMessage="No hay más libros de este autor"
+                                     styleClass="tabla-contenido">
+
+                            <p:column headerText="#{appmsg.col_sug_sug}"
+                                      sortBy="#{libro.nombrelibro}">
+                                <strong>#{libro.nombrelibro}</strong>
+                            </p:column>
+
+                            <p:column headerText="#{appmsg.col_anio_sug}"
+                                      sortBy="#{libro.aniolibro}">
+                                #{libro.aniolibro}
+                            </p:column>
+
+                            <p:column headerText="#{appmsg.col_tem_sug}"
+                                      sortBy="#{libro.tematica}">
+                                #{libro.tematica}
+                            </p:column>
+
+                            <p:column headerText="#{appmsg.col_acc_sug}">
+                                <p:commandButton value="#{appmsg.btn_ver_res_sug_sug}"
+                                                 action="#{reseniaBean.verReseniasYRedirigir(libro)}"
+                                                 process="@this"
+                                                 styleClass="boton boton-info boton-pequeno"
+                                                 title="#{appmsg.tit_btn_ver_res_sug_sug}"/>
+                            </p:column>
+
+                        </p:dataTable>
+                    </div>
+                </h:panelGroup>
+
+                <!-- Sugerencias por reseñas -->
+                <h:panelGroup rendered="#{sugerenciaBean.tipoSugerencia eq 'resenias'}">
+                    <div class="tarjeta">
+                        <h3>⭐ #{appmsg.tit_sug_h3}</h3>
+
+                        <p>
+                            #{appmsg.usus_res_res}
+                            <strong>#{sugerenciaBean.libroBase.nombrelibro}</strong>
+                            #{appmsg.usus_res_res_i}
+                        </p>
+
+                        <p:dataTable value="#{sugerenciaBean.librosSugeridos}"
+                                     var="libro"
+                                     paginator="true"
+                                     rows="5"
+                                     emptyMessage="No hay sugerencias basadas en reseñas"
+                                     styleClass="tabla-contenido">
+
+                            <p:column headerText="#{appmsg.col_sug_tit_sug}"
+                                      sortBy="#{libro.nombrelibro}">
+                                <strong>#{libro.nombrelibro}</strong><br/>
+                                <small>Autor: #{libro.autor}</small>
+                            </p:column>
+
+                            <p:column headerText="#{appmsg.col_sug_tem_sug}"
+                                      sortBy="#{libro.tematica}">
+                                #{libro.tematica}
+                            </p:column>
+
+                            <p:column headerText="#{appmsg.col_sug_anio_sug}"
+                                      sortBy="#{libro.aniolibro}">
+                                #{libro.aniolibro}
+                            </p:column>
+
+                            <p:column headerText="#{appmsg.col_sug_acc_sug}">
+                                <p:commandButton value="#{appmsg.btn_dt_ver_res_sug}"
+                                                 action="#{reseniaBean.verReseniasYRedirigir(libro)}"
+                                                 process="@this"
+                                                 styleClass="boton boton-info boton-pequeno"
+                                                 title="#{appmsg.tit_dt_ver_res_sug}"/>
+                            </p:column>
+
+                        </p:dataTable>
+                    </div>
+                </h:panelGroup>
+
+                <!-- Sin sugerencias seleccionadas -->
+                <div class="tarjeta"
+                     rendered="#{empty sugerenciaBean.tipoSugerencia}">
+                    <h3>🎯 #{appmsg.obtener_sug_h3}</h3>
+
+                    <div style="display: flex; gap: 30px; align-items: center; margin-top: 20px;">
+                        <div style="flex: 1; text-align: center;">
+                            <div style="font-size: 3rem; margin-bottom: 10px;">📖</div>
+                            <h4>#{appmsg.obtener_por_autor}</h4>
+                            <p>
+                               #{appmsg.ve_pag} <strong>#{appmsg.de_res}</strong> →<br/>
+                               #{appmsg.haz_click}  <strong>#{appmsg.otros_tit_sug}</strong>
+                            </p>
+                        </div>
+
+                        <div style="flex: 1; text-align: center;">
+                            <div style="font-size: 3rem; margin-bottom: 10px;">💡</div>
+                            <h4>#{appmsg.por_res_sim}</h4>
+                            <p>
+                                #{appmsg.ve_pag} <strong>#{appmsg.de_res}</strong> →<br/>
+                                #{appmsg.selec_lib} →<br/>
+                                #{appmsg.haz_click} <strong>#{appmsg.sug_por_res}</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones navegación -->
+                <div class="contenedor-navegacion">
+                    <p:button value="#{appmsg.btn_inicio_sug}"
+                              icon="pi pi-home"
+                              outcome="#{loginBean.rol eq 'Administrador' ? '/libros' : '/resenias'}"
+                              styleClass="boton-navegacion boton-inicio"
+                              title="#{appmsg.tit_btn_inicio_sug}"/>
+
+                    <p:button value="#{appmsg.btn_res_sug}"
+                              icon="pi pi-comments"
+                              outcome="/resenias"
+                              styleClass="boton-navegacion boton-secundario"
+                              title="#{appmsg.tit_btn_res_sug}"/>
+
+                    <p:commandButton value="#{appmsg.btn_out_sug}"
+                                     icon="pi pi-sign-out"
+                                     action="#{loginBean.logout}"
+                                     process="@this"
+                                     styleClass="boton-navegacion boton-logout"
+                                     title="#{appmsg.tit_btn_out_sug}"/>
+                </div>
+
+            </h:form>
+        </div>
+    </ui:define>
+</ui:composition>

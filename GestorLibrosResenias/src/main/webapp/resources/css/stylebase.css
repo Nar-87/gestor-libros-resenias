@@ -1,0 +1,200 @@
+/* ============================================
+   RESET Y CONFIGURACIONES BASE
+============================================ */
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-image: url("#{resource['img/f_login.jpg']}");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: auto;
+    background-attachment: fixed;
+}
+
+/* ESTRUCTURA DE LA PLANTILLA */
+.template-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Temas según rol - CABECERA Y PIE */
+.tema-admin .app-header {
+    background: linear-gradient(135deg, #8a8974 0%, #6e6d5d 100%);
+    border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+.tema-usuario .app-header {
+    background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
+    border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+.tema-admin .pie-pagina {
+    background: linear-gradient(135deg, #8a8974 0%, #6e6d5d 100%);
+    border-top: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+.tema-usuario .pie-pagina {
+    background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
+    border-top: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Header */
+.app-header {
+    padding: 1.2rem 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    position: relative;
+    z-index: 100;
+}
+
+.app-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    letter-spacing: 0.5px;
+}
+
+.header-user-info {
+    padding: 0.6rem 1.2rem;
+    border-radius: 30px;
+    font-size: 0.95rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.header-user-info strong {
+    color: white;
+    font-weight: 600;
+}
+
+.header-user-info i {
+    color: rgba(255, 255, 255, 0.9);
+    font-style: normal;
+    font-weight: 500;
+}
+
+/* Contenido principal */
+.template-main-content {
+    flex: 1;
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Footer */
+.pie-pagina {
+    padding: 1.2rem 2.5rem;
+    text-align: center;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 100;
+}
+
+.pie-pagina div:first-child {
+    font-weight: 500;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.help-link {
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    padding: 0.6rem 1.2rem;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.help-link:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* COMPONENTES GENERALES CON TRANSPARENCIA */
+
+/* Contenedores principales */
+.libros-container,
+.resenias-container,
+.contenedor-principal,
+.ayuda-container {
+   max-width: 900px;
+    margin: 20px auto;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    backdrop-filter: blur(3px);
+}
+
+/* Mensajes de error */
+.error-message {
+    color: #dc3545;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    display: block;
+    padding-left: 0.5rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    body {
+        background-attachment: scroll;
+    }
+    
+    .app-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+        padding: 1.2rem;
+    }
+    
+    .app-title {
+        font-size: 1.5rem;
+    }
+    
+    .template-main-content {
+        padding: 1rem;
+    }
+    
+    .pie-pagina {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.2rem;
+    }
+    
+    .libros-container,
+    .resenias-container,
+    .contenedor-principal,
+    .ayuda-container {
+        padding: 1.5rem;
+        border-radius: 15px;
+    }
+    
+    .form-buttons,
+    .navigation-buttons,
+    .export-buttons {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+    }
+}

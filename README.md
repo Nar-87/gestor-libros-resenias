@@ -177,15 +177,15 @@ Incluye script SQL para:
 
 ### Recomendaciones por autor
 
-![Sugerencias por autor](docs/capturas/sugerencias.png)
+![Sugerencias por autor](docs/capturas/sugerencias.PNG)
 
 ### Recomendaciones por reseñas similares
 
-![Sugerencias por reseñas](docs/capturas/sugerencias-resenias.png)
+![Sugerencias por reseñas](docs/capturas/sugerencias-resenias.PNG)
 
 ### Ayuda integrada
 
-![Ayuda](docs/capturas/ayuda.png)
+![Ayuda](docs/capturas/ayuda.PNG)
 
 ---
 
